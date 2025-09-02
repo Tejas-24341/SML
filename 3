@@ -1,0 +1,73 @@
+# Import libraries
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Multiple Linear Regression Model
+data = {
+    "delivery_time":[17.68, 12.50, 13.03, 15.88, 14.75, 19.11, 9, 18.83, 80.24, 22.50,
+                     36.10, 41.33, 22, 32, 14.50, 20.75, 25, 30.16, 20.35, 10.50],
+    "number_of_cases":[7, 9, 3, 4, 8, 7, 2, 9, 30, 19, 10, 6, 7, 3, 17, 10, 6, 7, 3, 17],
+    "distance":[560, 220, 340, 80, 150, 330, 110, 210, 1460, 605, 688, 
+                215, 255, 462, 448, 776, 200, 132, 36, 770]
+}
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+
+# Define dependent and independent variables
+y = df['delivery_time']
+X = df[['number_of_cases', 'distance']]
+
+# Add constant for intercept
+X = sm.add_constant(X)
+
+# Fit the regression model
+fitted_model = sm.OLS(y, X).fit()
+
+# Show regression summary
+print(fitted_model.summary())
+
+# -----------------------------
+# Plotting in 3D
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(df['number_of_cases'], df['distance'], df['delivery_time'])
+
+ax.set_xlabel('Number of Cases')
+ax.set_ylabel('Distance')
+ax.set_zlabel('Delivery Time')
+ax.set_title('3D Scatter Plot of Number of Cases, Distance, and Delivery Time')
+
+# Adjust the elevation and azimuthal angle
+ax.view_init(elev=20, azim=20)
+plt.show()
+
+# -----------------------------
+# 2D Scatter Plots
+fig, axs = plt.subplots(1, 2, figsize=(12, 5))
+
+# Scatter plot for number_of_cases vs delivery_time
+axs[0].scatter(df['number_of_cases'], df['delivery_time'])
+axs[0].set_xlabel('Number of Cases')
+axs[0].set_ylabel('Delivery Time')
+axs[0].set_title('Number of Cases vs Delivery Time')
+
+# Scatter plot for distance vs delivery_time
+axs[1].scatter(df['distance'], df['delivery_time'])
+axs[1].set_xlabel('Distance')
+axs[1].set_ylabel('Delivery Time')
+axs[1].set_title('Distance vs Delivery Time')
+
+plt.show()
+
+# -----------------------------
+# Verifying Gauss-Markov Theorem
+ols_estimate = fitted_model.params
+print("OLS Estimates:\n", ols_estimate)
+
+# Variance of OLS Estimate
+print("\nVariance-Covariance Matrix of Estimates:\n", fitted_model.cov_params())
